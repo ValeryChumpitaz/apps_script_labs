@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enviar Correo con Imagen</title>
+  <style>
+    .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      gap: 20px;
+    }
+    .formulario {
+      width: 55%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .vista-previa {
+      width: 40%;
+      text-align: center;
+    }
+    .vista-previa img {
+      width: 100%;
+      max-width: 250px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+    .botones {
+      display: flex;
+      justify-content: space-between;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .contador {
+      font-size: 14px;
+      color: red;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+  </style>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="formulario">
+      <h2>Enviar Correo con Imagen 📩</h2>
+      <input type="email" id="correo1" placeholder="Correo destinatario 1">
+      <input type="email" id="correo2" placeholder="Correo destinatario 2">
+      <input type="text" id="asunto" placeholder="Asunto">
+      <textarea id="mensaje" placeholder="Escribe tu mensaje..." rows="4"></textarea>
+      <input type="file" id="imagen" accept="image/*">
+      
+      <div class="botones">
+        <button onclick="enviarCorreo()"><i class="fas fa-paper-plane"></i> Enviar</button>
+        <button onclick="limpiarFormulario()"><i class="fas fa-broom"></i> Limpiar</button>
+      </div>
+      
+      <p id="respuesta"></p>
+      <p id="contador" class="contador" style="display: none;">
+        <i class="fas fa-clock"></i> <span id="tiempo">10</span> segundos...
+      </p>
+    </div>
+    
+    <div class="vista-previa">
+      <h4>Vista previa</h4>
+      <img id="preview" src="" alt="Vista previa de la imagen">
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("imagen").addEventListener("change", function () {
+      let file = this.files[0];
+      if (file) {
+        let reader = new FileReader();
+        reader.onload = function (e) {
+          let preview = document.getElementById("preview");
+          preview.src = e.target.result;
+          preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function enviarCorreo() {
+      let correo1 = document.getElementById("correo1").value.trim();
+      let correo2 = document.getElementById("correo2").value.trim();
+      let asunto = document.getElementById("asunto").value.trim();
+      let mensaje = document.getElementById("mensaje").value.trim();
+      let imagen = document.getElementById("imagen").files[0];
+
+      if (!correo1 || !correo2 || !asunto || !mensaje || !imagen) {
+        alert("Por favor, completa todos los campos y selecciona una imagen.");
+        return;
+      }
+
+      let destinatarios = `${correo1},${correo2}`;
+      let reader = new FileReader();
+      reader.readAsDataURL(imagen);
+      reader.onload = function () {
+        let imagenBase64 = reader.result.split(',')[1];
+
+        google.script.run
+          .withSuccessHandler(function (respuesta) {
+            console.log("Respuesta del servidor:", respuesta);
+            let mensajeRespuesta = document.getElementById("respuesta");
+            mensajeRespuesta.innerText = respuesta;
+            mensajeRespuesta.style.color = "green";
+
+            // Mostrar el contador y empezar la cuenta regresiva
+            let contador = document.getElementById("contador");
+            contador.style.display = "flex";
+            let tiempoRestante = 10;
+            let intervalo = setInterval(() => {
+              document.getElementById("tiempo").innerText = tiempoRestante;
+              if (tiempoRestante === 0) {
+                clearInterval(intervalo);
+                limpiarFormulario();
+                contador.style.display = "none";
+              }
+              tiempoRestante--;
+            }, 1000);
+          })
+          .withFailureHandler(function (error) {
+            console.error("Error en el servidor:", error);
+            let mensajeRespuesta = document.getElementById("respuesta");
+            mensajeRespuesta.innerText = "Error al enviar el correo.";
+            mensajeRespuesta.style.color = "red";
+          })
+          .enviarCorreo(asunto, mensaje, imagenBase64, imagen.name, destinatarios);
+      };
+
+      reader.onerror = function () {
+        alert("Error al leer la imagen.");
+      };
+    }
+
+    function limpiarFormulario() {
+      document.getElementById("correo1").value = "";
+      document.getElementById("correo2").value = "";
+      document.getElementById("asunto").value = "";
+      document.getElementById("mensaje").value = "";
+      document.getElementById("imagen").value = "";
+
+      let preview = document.getElementById("preview");
+      preview.src = "";
+      preview.style.display = "none";
+
+      document.getElementById("respuesta").innerText = "";
+      document.getElementById("contador").style.display = "none";
+    }
+  </script>
+</body>
+</html>
