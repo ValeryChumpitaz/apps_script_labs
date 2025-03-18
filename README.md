@@ -10,10 +10,12 @@ apps_script_labs/
 │── 01_enviar_correo_con_imagen/
 │   ├── Código fuente (Apps Script)
 │   ├── README.md (Explicación del laboratorio)
-│── 02_Proximamente.../
+│── 02_enviar_correo_con_mjml.../
 │   ├── Código fuente (Apps Script)
 │   ├── README.md (Explicación del laboratorio)
-│── ...
+│── 03_proximo.../
+│   ├── Código fuente (Apps Script)
+│   ├── README.md (Explicación del laboratorio)
 │── README.md (Este archivo)
 ```
 
