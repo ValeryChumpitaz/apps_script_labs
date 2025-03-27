@@ -1,174 +1,215 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8"> <!-- Define la codificación de caracteres -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Enviar Correo con Imagen</title>
+  <!-- Configura el viewport para dispositivos móviles -->
+  <title>Enviar Correo con Imagen</title> <!-- Título de la página -->
   <style>
     .container {
       display: flex;
+      /* Convierte el elemento en un contenedor flexible */
       justify-content: space-between;
+      /* Distribuye los elementos con espacio igual entre ellos */
       align-items: flex-start;
+      /* Alinea los elementos al inicio del eje transversal (arriba) */
       max-width: 800px;
+      /* Establece un ancho máximo de 800 píxeles */
       margin: auto;
+      /* Centra el contenedor horizontalmente */
       padding: 20px;
+      /* Añade un relleno de 20 píxeles alrededor del contenido */
       gap: 20px;
+      /* Añade un espacio de 20 píxeles entre los elementos flexibles */
     }
+
     .formulario {
       width: 55%;
+      /* Establece el ancho del formulario al 55% de su contenedor padre */
       display: flex;
+      /* Convierte el formulario en un contenedor flexible */
       flex-direction: column;
+      /* Organiza los elementos hijos en una columna, uno encima del otro */
       gap: 10px;
+      /* Agrega un espacio de 10 píxeles entre los elementos hijos dentro del formulario */
     }
+
     .vista-previa {
       width: 40%;
+      /* Establece el ancho de la vista previa al 40% de su contenedor padre */
       text-align: center;
+      /* Centra el contenido de la vista previa horizontalmente */
     }
+
     .vista-previa img {
       width: 100%;
+      /* Hace que la imagen ocupe el 100% del ancho de su contenedor padre (la vista previa) */
       max-width: 250px;
+      /* Establece un ancho máximo de 250 píxeles para la imagen */
       border-radius: 10px;
+      /* Redondea las esquinas de la imagen */
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      /* Agrega una sombra sutil a la imagen */
       display: none;
+      /* Oculta la imagen por defecto. Esto es útil para mostrar la imagen solo cuando se carga o se selecciona. */
     }
+
     .botones {
       display: flex;
+      /* Convierte el contenedor de botones en un contenedor flexible */
       justify-content: space-between;
+      /* Distribuye los botones con espacio igual entre ellos, colocando el primero al principio y el último al final */
     }
+
     button {
       background-color: #007bff;
+      /* Color de fondo azul */
       color: white;
+      /* Color del texto blanco */
       border: none;
+      /* Sin borde */
       padding: 10px;
+      /* Relleno interno de 10 píxeles */
       border-radius: 5px;
+      /* Esquinas redondeadas */
       cursor: pointer;
+      /* Cambia el cursor a una mano al pasar por encima */
       display: flex;
+      /* Convierte el botón en un contenedor flexible */
       align-items: center;
+      /* Alinea el contenido del botón verticalmente al centro */
       gap: 5px;
+      /* Agrega un espacio de 5 píxeles entre los elementos dentro del botón */
     }
+
     button:hover {
       background-color: #0056b3;
+      /* Cambia el color de fondo del botón a un azul más oscuro al pasar el ratón por encima */
     }
+
     .contador {
       font-size: 14px;
+      /* Tamaño de fuente de 14 píxeles */
       color: red;
+      /* Color del texto rojo */
       font-weight: bold;
+      /* Texto en negrita */
       display: flex;
+      /* Convierte el contador en un contenedor flexible */
       align-items: center;
+      /* Alinea el contenido del contador verticalmente al centro */
       gap: 5px;
+      /* Agrega un espacio de 5 píxeles entre los elementos dentro del contador */
     }
   </style>
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
   <div class="container">
     <div class="formulario">
       <h2>Enviar Correo con Imagen 📩</h2>
-      <input type="email" id="correo1" placeholder="Correo destinatario 1">
-      <input type="email" id="correo2" placeholder="Correo destinatario 2">
-      <input type="text" id="asunto" placeholder="Asunto">
+      <input type="email" id="correo1" placeholder="Correo destinatario 1"> <!-- Primer campo de correo -->
+      <input type="email" id="correo2" placeholder="Correo destinatario 2"> <!-- Segundo campo de correo -->
+      <input type="text" id="asunto" placeholder="Asunto"> <!-- Campo para el asunto del correo -->
       <textarea id="mensaje" placeholder="Escribe tu mensaje..." rows="4"></textarea>
-      <input type="file" id="imagen" accept="image/*">
-      
+      <!-- Área de texto para el mensaje -->
+      <input type="file" id="imagen" accept="image/*"> <!-- Selector de archivos para la imagen -->
+
       <div class="botones">
         <button onclick="enviarCorreo()"><i class="fas fa-paper-plane"></i> Enviar</button>
+        <!-- Botón para enviar el correo -->
         <button onclick="limpiarFormulario()"><i class="fas fa-broom"></i> Limpiar</button>
+        <!-- Botón para limpiar los campos -->
       </div>
-      
-      <p id="respuesta"></p>
+
+      <p id="respuesta"></p> <!-- Espacio para mostrar mensajes de respuesta -->
       <p id="contador" class="contador" style="display: none;">
         <i class="fas fa-clock"></i> <span id="tiempo">10</span> segundos...
       </p>
     </div>
-    
+
     <div class="vista-previa">
       <h4>Vista previa</h4>
-      <img id="preview" src="" alt="Vista previa de la imagen">
+      <img id="preview" src="" alt="Vista previa de la imagen"> <!-- Imagen de vista previa -->
     </div>
   </div>
 
   <script>
     document.getElementById("imagen").addEventListener("change", function () {
-      let file = this.files[0];
+      let file = this.files[0]; // Obtiene el archivo seleccionado
       if (file) {
-        let reader = new FileReader();
+        let reader = new FileReader(); // Crea un objeto para leer archivos
         reader.onload = function (e) {
           let preview = document.getElementById("preview");
-          preview.src = e.target.result;
+          preview.src = e.target.result; // Muestra la imagen seleccionada
           preview.style.display = "block";
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(file); // Convierte la imagen a Base64
       }
     });
 
-    function enviarCorreo() {
-      let correo1 = document.getElementById("correo1").value.trim();
-      let correo2 = document.getElementById("correo2").value.trim();
-      let asunto = document.getElementById("asunto").value.trim();
-      let mensaje = document.getElementById("mensaje").value.trim();
-      let imagen = document.getElementById("imagen").files[0];
+function enviarCorreo() {
+    let correo1 = document.getElementById("correo1").value.trim(); // Obtiene el valor del primer correo y elimina espacios en blanco
+    let correo2 = document.getElementById("correo2").value.trim(); // Obtiene el valor del segundo correo y elimina espacios en blanco
+    let asunto = document.getElementById("asunto").value.trim(); // Obtiene el valor del asunto y elimina espacios en blanco
+    let mensaje = document.getElementById("mensaje").value.trim(); // Obtiene el valor del mensaje y elimina espacios en blanco
+    let imagen = document.getElementById("imagen").files[0]; // Obtiene el archivo de imagen seleccionado
 
-      if (!correo1 || !correo2 || !asunto || !mensaje || !imagen) {
-        alert("Por favor, completa todos los campos y selecciona una imagen.");
-        return;
-      }
-
-      let destinatarios = `${correo1},${correo2}`;
-      let reader = new FileReader();
-      reader.readAsDataURL(imagen);
-      reader.onload = function () {
-        let imagenBase64 = reader.result.split(',')[1];
-
-        google.script.run
-          .withSuccessHandler(function (respuesta) {
-            console.log("Respuesta del servidor:", respuesta);
-            let mensajeRespuesta = document.getElementById("respuesta");
-            mensajeRespuesta.innerText = respuesta;
-            mensajeRespuesta.style.color = "green";
-
-            // Mostrar el contador y empezar la cuenta regresiva
-            let contador = document.getElementById("contador");
-            contador.style.display = "flex";
-            let tiempoRestante = 10;
-            let intervalo = setInterval(() => {
-              document.getElementById("tiempo").innerText = tiempoRestante;
-              if (tiempoRestante === 0) {
-                clearInterval(intervalo);
-                limpiarFormulario();
-                contador.style.display = "none";
-              }
-              tiempoRestante--;
-            }, 1000);
-          })
-          .withFailureHandler(function (error) {
-            console.error("Error en el servidor:", error);
-            let mensajeRespuesta = document.getElementById("respuesta");
-            mensajeRespuesta.innerText = "Error al enviar el correo.";
-            mensajeRespuesta.style.color = "red";
-          })
-          .enviarCorreo(asunto, mensaje, imagenBase64, imagen.name, destinatarios);
-      };
-
-      reader.onerror = function () {
-        alert("Error al leer la imagen.");
-      };
+    if (!correo1 || !correo2 || !asunto || !mensaje || !imagen) { // Verifica si algún campo está vacío
+        alert("Por favor, completa todos los campos y selecciona una imagen."); // Muestra una alerta si falta algún dato
+        return; // Detiene la ejecución de la función
     }
 
-    function limpiarFormulario() {
-      document.getElementById("correo1").value = "";
-      document.getElementById("correo2").value = "";
-      document.getElementById("asunto").value = "";
-      document.getElementById("mensaje").value = "";
-      document.getElementById("imagen").value = "";
+    let destinatarios = `${correo1},${correo2}`; // Combina los correos en una cadena separada por comas
+    let reader = new FileReader(); // Crea un objeto FileReader para leer el archivo de imagen
+    reader.readAsDataURL(imagen); // Lee el archivo de imagen como una URL de datos (Base64)
+    reader.onload = function () { // Define una función que se ejecuta cuando la lectura de la imagen se completa
+        let imagenBase64 = reader.result.split(',')[1]; // Extrae la parte Base64 de la URL de datos
 
-      let preview = document.getElementById("preview");
-      preview.src = "";
-      preview.style.display = "none";
+        google.script.run // Llama a la función en el script de Google Apps Script
+            .withSuccessHandler(function (respuesta) { // Define una función para manejar el éxito
+                let mensajeRespuesta = document.getElementById("respuesta"); // Obtiene el elemento para mostrar la respuesta
+                mensajeRespuesta.innerText = respuesta; // Muestra la respuesta del script
+                mensajeRespuesta.style.color = "green"; // Cambia el color del texto a verde
 
-      document.getElementById("respuesta").innerText = "";
-      document.getElementById("contador").style.display = "none";
-    }
+                let contador = document.getElementById("contador"); // Obtiene el elemento del contador
+                contador.style.display = "flex"; // Muestra el contador
+                let tiempoRestante = 10; // Establece el tiempo inicial del contador
+                let intervalo = setInterval(() => { // Inicia un intervalo para actualizar el contador cada segundo
+                    document.getElementById("tiempo").innerText = tiempoRestante; // Actualiza el texto del contador
+                    if (tiempoRestante === 0) { // Verifica si el contador ha llegado a cero
+                        clearInterval(intervalo); // Detiene el intervalo
+                        limpiarFormulario(); // Llama a la función para limpiar el formulario
+                        contador.style.display = "none"; // Oculta el contador
+                    }
+                    tiempoRestante--; // Decrementa el tiempo restante
+                }, 1000); // Establece el intervalo en 1 segundo
+            })
+            .withFailureHandler(function (error) { // Define una función para manejar el error
+                let mensajeRespuesta = document.getElementById("respuesta"); // Obtiene el elemento para mostrar la respuesta
+                mensajeRespuesta.innerText = "Error al enviar el correo."; // Muestra un mensaje de error
+                mensajeRespuesta.style.color = "red"; // Cambia el color del texto a rojo
+            })
+            .enviarCorreo(asunto, mensaje, imagenBase64, imagen.name, destinatarios); // Llama a la función en el script de Google Apps Script con los datos
+    };
+}
+
+  function limpiarFormulario() {
+      document.getElementById("correo1").value = ""; // Limpia el valor del primer correo
+      document.getElementById("correo2").value = ""; // Limpia el valor del segundo correo
+      document.getElementById("asunto").value = ""; // Limpia el valor del asunto
+      document.getElementById("mensaje").value = ""; // Limpia el valor del mensaje
+      document.getElementById("imagen").value = ""; // Limpia el valor de la imagen
+
+      let preview = document.getElementById("preview"); // Obtiene el elemento de la vista previa de la imagen
+      preview.src = ""; // Limpia la fuente de la imagen de vista previa
+      preview.style.display = "none"; // Oculta la vista previa de la imagen
+
+      document.getElementById("respuesta").innerText = ""; // Limpia el texto de la respuesta
+      document.getElementById("contador").style.display = "none"; // Oculta el contador
+  }
   </script>
 </body>
+
 </html>
